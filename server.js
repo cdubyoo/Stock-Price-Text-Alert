@@ -84,9 +84,3 @@ app.post('/', function(req, res){
 
  
 
-    /* client.messages.create({
-        to: '+14156527111',
-        from: '+12057829974',
-        body: tickerInput.toUpperCase()+" has fallen below "+tickerPrice+"!"
-      }); */
-    
