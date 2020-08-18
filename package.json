@@ -1,0 +1,23 @@
+{
+  "name": "stockapp",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "http-server": "^0.12.3",
+    "multer": "^1.4.2",
+    "node-fetch": "^2.6.0",
+    "readline-sync": "^1.4.10",
+    "twilio": "^3.48.2"
+  }
+}
