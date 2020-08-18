@@ -55,20 +55,20 @@ app.post('/', function(req, res){
   async function getData() {
     try {
       const response = await axios.get(url);
-      const currentPrice = response.data;
+      var currentPrice = response.data;
       console.log(currentPrice);
       if (currentPrice > tickerPrice) {
         console.log("Current price is above input, and will continue searching.")
         setTimeout(getData, 300000);
       } else {
         console.log("Current price is below input, will stop searching and alert user at +"+numberInput)
-        clearTimeout(getData);
         // twilio text when price is below user input
         client.messages.create({
           to: '+14156527111',
           from:'+12057829974',
-          body: tickerInput.toUpperCase()+" has fallen below "+tickerPrice+"!"
+          body: tickerInput.toUpperCase()+" is currently at "+currentPrice+" and has fallen below "+tickerPrice+"!"
         }) 
+        clearTimeout(getData);
       }
     } catch (error) {
       console.log(error);
