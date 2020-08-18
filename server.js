@@ -33,11 +33,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/', function(req, res){
   // storing ticker input/price and number
-  let numberInput = (req.body.number);
-  let tickerPrice = (req.body.price);
   let tickerInput = (req.body.ticker);
+  let tickerPrice = (req.body.price);
+  if (tickerPrice < 0) {
+    res.send('Please input a number above 0 for the price to be alerted at.')
+  }
+  let numberInput = (req.body.number);
   if (numberInput.length != 11) {
-    res.send('Invalid phone number, please make sure you typed in a correct 11 digit US phone number. Example: 14156825971')
+    res.send('Invalid phone number, please make sure you typed in a correct 11-digit US phone number. Example: 14156825971')
   }
   console.log("Looking up ticker "+tickerInput.toUpperCase()+"..."); // log to make sure input is correct
   console.log("Searching if price is below "+(tickerPrice)+"..."); // ^^ price 
@@ -58,7 +61,7 @@ app.post('/', function(req, res){
         console.log("Current price is above input, and will continue searching.")
         setTimeout(getData, 3000);
       } else {
-        console.log("Current price is below input, will stop searching and alert user")
+        console.log("Current price is below input, will stop searching and alert user at +"+numberInput)
         clearTimeout(getData);
         // twilio text when price is below user input
       /*  client.messages.create({
@@ -69,17 +72,17 @@ app.post('/', function(req, res){
       }
     } catch (error) {
       console.log(error);
-      res.status(400).send('Invalid input, please go back and try again.')
+      res.status(400).send('Invalid ticker input, please go back and try again.')
     }
   };
   // the formuoli
   getData();
-  
+
 }); // closing tags
     
 
 
-  /* res.status(400).send('Invalid input, please go back and try again.') //error message */
+ 
 
     /* client.messages.create({
         to: '+14156527111',
