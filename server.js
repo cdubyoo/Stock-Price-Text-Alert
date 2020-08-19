@@ -4,14 +4,14 @@ const app = express();
 const bodyParser = require('body-parser');
 var port = process.env.PORT || 8080
 var twilio = require('twilio');
-var client = new twilio('ACec8293c0145ed41cb4ed95a7f6c76b1e', '504eba99f793b33331f3506030dd41fa');
+var client = new twilio('ACec8293c0145ed41cb4ed95a7f6c76b1e', 'da5dd0cdfa4acbcf5e36ac4952cc0c6f');
 
 // console logging that server is running
 app.listen(port, () => {
   console.log(`stock app listening at http://localhost:${port}`)
 });
 
-// routing static fille, linking the public folder
+// routing static file, linking the public folder
 app.use(express.static("public"));
 app.get("/", (request, response) => {
   response.sendFile(__dirname + "/index.html");
@@ -59,16 +59,17 @@ app.post('/', function(req, res){
       console.log(currentPrice);
       if (currentPrice > tickerPrice) {
         console.log("Current price is above input, and will continue searching.")
-        setTimeout(getData, 300000);
+        setTimeout(getData, 3000);
       } else {
+        console.log(tickerInput.toUpperCase()+" is currently at "+currentPrice+" and has fallen below "+tickerPrice+"!")
         console.log("Current price is below input, will stop searching and alert user at +"+numberInput)
+        clearTimeout(getData);
         // twilio text when price is below user input
         client.messages.create({
-          to: '+14156527111',
+          to: '+'+numberInput ,
           from:'+12057829974',
           body: tickerInput.toUpperCase()+" is currently at "+currentPrice+" and has fallen below "+tickerPrice+"!"
         }) 
-        clearTimeout(getData);
       }
     } catch (error) {
       console.log(error);
