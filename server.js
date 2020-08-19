@@ -59,7 +59,8 @@ app.post('/', function(req, res){
       console.log(currentPrice);
       if (currentPrice > tickerPrice) {
         console.log("Current price is above input, and will continue searching.")
-        setTimeout(getData, 300000);
+        setTimeout(getData, 3000);
+        res.end('Current price is above '+tickerPrice+', and will check again after 5 minutes.')
       } else {
         console.log(tickerInput.toUpperCase()+" is currently at "+currentPrice+" and has fallen below "+tickerPrice+"!")
         console.log("Current price is below input, will stop searching and alert user at +"+numberInput)
