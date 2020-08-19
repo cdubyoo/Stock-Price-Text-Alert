@@ -64,6 +64,7 @@ app.post('/', function(req, res){
       } else {
         console.log(tickerInput.toUpperCase()+" is currently at "+currentPrice+" and has fallen below "+tickerPrice+"!")
         console.log("Current price is below input, will stop searching and alert user at +"+numberInput)
+        res.end('Current price at '+currentPrice+', which is below '+tickerPrice+', text alert has been sent to '+numberInput)
         clearTimeout(getData);
         // twilio text when price is below user input
         client.messages.create({
