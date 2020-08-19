@@ -18,6 +18,30 @@ app.get("/", (request, response) => {
 });
 
 
+// create authentication
+app.get('/login', (req,res) => {
+  res.render('login.html')
+})
+
+app.get('/register', (req,res) => {
+  res.render('register.html')
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // making api request using axios
 const axios = require("axios");
 const { stringify } = require('querystring');
