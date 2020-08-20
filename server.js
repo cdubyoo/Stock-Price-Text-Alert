@@ -1,10 +1,40 @@
 // setting up server constants
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
 var port = process.env.PORT || 8080
-var twilio = require('twilio');
+var twilio = require('twilio')
 var client = new twilio('ACec8293c0145ed41cb4ed95a7f6c76b1e', 'da5dd0cdfa4acbcf5e36ac4952cc0c6f');
+
+
+const mongoose =require('mongoose');
+const bcrypt = require('bcryptjs');
+const { ensureAuthenticated, forwardAuthenticated } = require('./config/auth.js');
+
+// db config
+const db =require('./config/keys').MongoURI;
+
+// passport config
+const passport = require('passport');
+require('./config/passport')(passport);
+
+//setting up connect-flash
+const session = require('express-session');
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true
+})
+);
+//passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// connect to mongo
+mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true})
+  .then(()=> console.log('MongoDB Connected...'))
+  .catch(err => console.log(err))
 
 // console logging that server is running
 app.listen(port, () => {
@@ -13,21 +43,87 @@ app.listen(port, () => {
 
 // routing static file, linking the public folder
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: false})); // to access login and password from post method
 app.get("/", (request, response) => {
-  response.sendFile(__dirname + "/index.html");
+  response.sendFile(__dirname + "/public/login.html");
 });
 
 
 // create authentication
+
+// User model
+
+const User = require('./models/User.js')
+
+// login page
 app.get('/login', (req,res) => {
   res.render('login.html')
 })
 
+// app page
+app.get('/app', ensureAuthenticated, (req, res) => res.render('app.html'));
+
+// register page
 app.get('/register', (req,res) => {
   res.render('register.html')
 })
 
 
+// setting up register page
+app.post('/register', (req, res) => {
+  const { username, password, password2 } = req.body;
+  let errors = [];
+
+  if(password !== password2) {
+    errors.push({msg: 'passwords do not match'})
+    res.redirect('/register3.html')
+  } else {
+    // validation passed
+    User.findOne({ username: username})
+    .then(user => {
+      if(user) {
+        // User exists
+        errors.push({msg: 'user name is taken'})
+        res.redirect('/register2.html')
+    } else {
+      const newUser = new User({
+        username,
+        password
+      });
+      console.log(newUser)
+
+      // hash password
+      bcrypt.genSalt(10, (err, salt) => 
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          if(err) throw err;
+          // set password to hashed
+          newUser.password = hash;
+          // save user
+          newUser.save()
+            .then(user => {
+              res.redirect('/register4.html');
+            })
+            .catch(err => console.log(err));
+        }))
+    }
+});
+}})
+
+// login handle
+
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local', {
+    successRedirect: '/login3.html',
+    failureRedirect: '/login2.html',
+  }) (req, res, next);
+})
+
+// log out handle
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/login.html')
+});
 
 
 
@@ -39,7 +135,7 @@ app.get('/register', (req,res) => {
 
 
 
-
+// stock app!
 
 
 // making api request using axios
@@ -55,7 +151,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 
 
-app.post('/', function(req, res){
+app.post('/stock', function(req, res){
   // storing ticker input/price and number
   let tickerInput = (req.body.ticker);
   let tickerPrice = (req.body.price);
@@ -110,4 +206,4 @@ app.post('/', function(req, res){
 
 
  
-
+  
